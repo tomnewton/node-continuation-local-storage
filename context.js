@@ -45,17 +45,20 @@ Namespace.prototype.run = function (fn) {
   var context = this.createContext();
   this.enter(context);
   try {
-    fn(context);
-    return context;
+    var contextFnResult = fn(context);
+	  return context;
   }
   catch (exception) {
     if (exception) {
       exception[ERROR_SYMBOL] = context;
     }
+    this.exit(context);
     throw exception;
   }
   finally {
-    this.exit(context);
+    context.res.on('finish', function() {
+		this.exit(context);
+    });
   }
 };
 
